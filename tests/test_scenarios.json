@@ -1,0 +1,105 @@
+[
+  {
+    "name": "Simple Application Status Check",
+    "query": "What is the status of application APP00001?",
+    "expected_agents": [
+      "supervisor_agent",
+      "candidate_screening_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 2,
+    "should_escalate": false
+  },
+  {
+    "name": "Payment Processing with Clarification",
+    "query": "Process payment for candidate CAND00001",
+    "expected_agents": [
+      "supervisor_agent",
+      "payroll_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 3,
+    "should_escalate": false,
+    "requires_clarification": true
+  },
+  {
+    "name": "Multi-Domain Query",
+    "query": "Show me onboarding status and payment history for CAND00001",
+    "expected_agents": [
+      "supervisor_agent",
+      "onboarding_agent",
+      "payroll_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 3,
+    "should_escalate": false
+  },
+  {
+    "name": "Compliance Verification",
+    "query": "Verify KRA PIN for candidate CAND00001",
+    "expected_agents": [
+      "supervisor_agent",
+      "compliance_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 2,
+    "should_escalate": false
+  },
+  {
+    "name": "Analytics Request",
+    "query": "Show me hiring metrics for the last 30 days",
+    "expected_agents": [
+      "supervisor_agent",
+      "analytics_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 2,
+    "should_escalate": false
+  },
+  {
+    "name": "General FAQ",
+    "query": "What documents do I need for onboarding?",
+    "expected_agents": [
+      "supervisor_agent",
+      "general_help_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 2,
+    "should_escalate": false,
+    "uses_rag": true
+  },
+  {
+    "name": "Human Escalation Request",
+    "query": "I need to speak with a human HR specialist",
+    "expected_agents": [
+      "supervisor_agent",
+      "human_escalation_agent"
+    ],
+    "expected_iterations": 1,
+    "should_escalate": true
+  },
+  {
+    "name": "Missing Information - Should Ask",
+    "query": "What's my application status?",
+    "expected_agents": [
+      "supervisor_agent",
+      "candidate_screening_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 3,
+    "should_escalate": false,
+    "requires_clarification": true
+  },
+  {
+    "name": "Complex Edge Case",
+    "query": "I was hired but haven't received onboarding documents or payment details",
+    "expected_agents": [
+      "supervisor_agent",
+      "onboarding_agent",
+      "payroll_agent",
+      "final_answer_agent"
+    ],
+    "expected_iterations": 4,
+    "should_escalate": false
+  }
+]

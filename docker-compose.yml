@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Hifadhi Multi-Agent Application
+  hifadhi:
+    build: .
+    container_name: hifadhi-app
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PAYLINK_API_KEY=${PAYLINK_API_KEY}
+      - PAYLINK_API_SECRET=${PAYLINK_API_SECRET}
+      - PAYLINK_WEBHOOK_SECRET=${PAYLINK_WEBHOOK_SECRET}
+      - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006/v1/traces
+      - DATABASE_PATH=/app/data/hifadhi.db
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    networks:
+      - hifadhi-network
+    depends_on:
+      - phoenix
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Phoenix Observability
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: hifadhi-phoenix
+    ports:
+      - "6006:6006"
+    environment:
+      - PHOENIX_PORT=6006
+    volumes:
+      - phoenix-data:/phoenix/data
+    networks:
+      - hifadhi-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:6006/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  hifadhi-network:
+    driver: bridge
+
+volumes:
+  phoenix-data:
+    driver: local

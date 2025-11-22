@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-11-22T13:28:36.465630",
+  "checks": [
+    "\u2705 Node 'supervisor_agent' exists",
+    "\u2705 Node 'candidate_screening_agent' exists",
+    "\u2705 Node 'onboarding_agent' exists",
+    "\u2705 Node 'compliance_agent' exists",
+    "\u2705 Node 'payroll_agent' exists",
+    "\u2705 Node 'analytics_agent' exists",
+    "\u2705 Node 'general_help_agent' exists",
+    "\u2705 Node 'human_escalation_agent' exists",
+    "\u2705 Node 'final_answer_agent' exists",
+    "\u2705 Entry point (supervisor_agent) is valid",
+    "\u2705 Terminal node 'final_answer_agent' exists",
+    "\u2705 Terminal node 'human_escalation_agent' exists",
+    "\u2705 Specialist 'candidate_screening_agent' has return edge",
+    "\u2705 Specialist 'onboarding_agent' has return edge",
+    "\u2705 Specialist 'compliance_agent' has return edge",
+    "\u2705 Specialist 'payroll_agent' has return edge",
+    "\u2705 Specialist 'analytics_agent' has return edge",
+    "\u2705 Specialist 'general_help_agent' has return edge"
+  ],
+  "errors": [],
+  "warnings": [],
+  "summary": {
+    "total_checks": 18,
+    "total_errors": 0,
+    "total_warnings": 0,
+    "status": "PASS"
+  }
+}

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hifadhi AI | Intelligent HR OS</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom Config for Soft UI -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#8b5cf6', // Violet 500
+                        secondary: '#f1f5f9', // Slate 100
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+                        'glow': '0 0 20px rgba(139, 92, 246, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Toast Animation */
+        .toast-enter {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .toast-enter-active {
+            transform: translateX(0);
+            opacity: 1;
+            transition: all 0.3s ease-out;
+        }
+
+        .toast-exit {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-exit-active {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease-in;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased overflow-hidden flex h-screen">
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-sidebar h-full flex flex-col shadow-soft z-20 transition-all duration-300">
+        <div class="p-8 flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white shadow-glow">
+                <i class="fas fa-atom text-lg"></i>
+            </div>
+            <span class="font-bold text-xl tracking-tight text-slate-800">Hifadhi<span
+                    class="text-violet-500">.ai</span></span>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="switchPage('dashboard')"
+                class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-violet-50 hover:text-violet-600 transition-all group active">
+                <i class="fas fa-chart-pie text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Dashboard</span>
+            </button>
+            <button onclick="switchPage('candidates')"
+                class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-violet-50 hover:text-violet-600 transition-all group">
+                <i class="fas fa-user-group text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Candidates</span>
+            </button>
+            <button onclick="switchPage('applications')"
+                class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-violet-50 hover:text-violet-600 transition-all group">
+                <i class="fas fa-briefcase text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Applications</span>
+            </button>
+            <button onclick="switchPage('jobs')"
+                class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-violet-50 hover:text-violet-600 transition-all group">
+                <i class="fas fa-building text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Jobs</span>
+            </button>
+        </nav>
+
+        <div class="p-6">
+            <div
+                class="glass-panel p-4 rounded-2xl bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border-violet-100">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs font-semibold text-violet-700 uppercase tracking-wider">System Status</span>
+                </div>
+                <p class="text-xs text-slate-600">AI Agents Online & Ready</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <!-- Top Bar -->
+        <header class="h-20 px-8 flex items-center justify-between z-10">
+            <h1 id="pageTitle" class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
+
+            <div class="flex items-center gap-4">
+                <button onclick="refreshData()"
+                    class="w-10 h-10 rounded-full bg-white shadow-soft flex items-center justify-center text-slate-500 hover:text-violet-600 hover:shadow-md transition-all">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+                    <div class="text-right hidden md:block">
+                        <div class="text-sm font-bold text-slate-800">Admin User</div>
+                        <div class="text-xs text-slate-500">HR Manager</div>
+                    </div>
+                    <div
+                        class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-cyan-300 shadow-md border-2 border-white">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div id="contentArea" class="flex-1 overflow-y-auto px-8 pb-8">
+
+            <!-- Dashboard View -->
+            <div id="dashboard" class="page-view fade-in space-y-6">
+                <!-- Stats Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Stat Card 1 -->
+                    <div
+                        class="glass-panel p-6 rounded-3xl shadow-soft hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-lg bg-green-100 text-green-600">+12%</span>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 mb-1" id="totalCandidates">-</div>
+                        <div class="text-sm text-slate-500 font-medium">Total Candidates</div>
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="aiSuggestion1">Loading AI tip...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 2 -->
+                    <div
+                        class="glass-panel p-6 rounded-3xl shadow-soft hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-xl">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <span
+                                class="text-xs font-bold px-2 py-1 rounded-lg bg-purple-100 text-purple-600">Active</span>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 mb-1" id="activeApplications">-</div>
+                        <div class="text-sm text-slate-500 font-medium">Applications</div>
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="aiSuggestion2">Loading AI tip...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 3 -->
+                    <div
+                        class="glass-panel p-6 rounded-3xl shadow-soft hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center text-xl">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 mb-1" id="interviewsScheduled">-</div>
+                        <div class="text-sm text-slate-500 font-medium">Interviews Set</div>
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="aiSuggestion3">Loading AI tip...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 4 -->
+                    <div
+                        class="glass-panel p-6 rounded-3xl shadow-soft hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 mb-1" id="hiredThisMonth">-</div>
+                        <div class="text-sm text-slate-500 font-medium">Hired This Month</div>
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="aiSuggestion4">Loading AI tip...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity / Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-soft">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Applications</h3>
+                        <div id="recentAppsTable" class="overflow-hidden rounded-xl border border-slate-100">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div
+                        class="glass-panel rounded-3xl p-6 shadow-soft bg-gradient-to-br from-violet-600 to-indigo-600 text-white relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-2xl">
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 w-24 h-24 bg-fuchsia-500 opacity-20 rounded-full -ml-10 -mb-10 blur-xl">
+                        </div>
+
+                        <h3 class="text-lg font-bold mb-2 relative z-10">Quick Actions</h3>
+                        <p class="text-white/80 text-sm mb-6 relative z-10">Use AI agents to speed up your workflow.</p>
+
+                        <div class="space-y-3 relative z-10">
+                            <button onclick="openModal('jobModal')"
+                                class="w-full py-3 px-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center gap-3 transition-all border border-white/10">
+                                <i class="fas fa-plus-circle"></i> Post New Job
+                            </button>
+                            <button onclick="openModal('candidateModal')"
+                                class="w-full py-3 px-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center gap-3 transition-all border border-white/10">
+                                <i class="fas fa-user-plus"></i> Add Candidate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates View -->
+            <div id="candidates" class="page-view hidden fade-in">
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" placeholder="Search candidates..."
+                                class="pl-10 pr-4 py-2 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500 w-64 text-sm">
+                        </div>
+                        <button onclick="openModal('candidateModal')"
+                            class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-violet-200">
+                            <i class="fas fa-plus mr-2"></i> Add Candidate
+                        </button>
+                    </div>
+                    <div id="candidatesTable" class="w-full"></div>
+                </div>
+            </div>
+
+            <!-- Applications View -->
+            <div id="applications" class="page-view hidden fade-in">
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h2 class="font-bold text-lg">All Applications</h2>
+                        <button onclick="loadApplications()" class="text-slate-500 hover:text-violet-600"><i
+                                class="fas fa-sync"></i></button>
+                    </div>
+                    <div id="applicationsTable" class="w-full"></div>
+                </div>
+            </div>
+
+            <!-- Jobs View -->
+            <div id="jobs" class="page-view hidden fade-in">
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <button onclick="openModal('jobModal')"
+                            class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-violet-200">
+                            <i class="fas fa-plus mr-2"></i> Post Job
+                        </button>
+                    </div>
+                    <div id="jobsTable" class="w-full"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- AI Side Panel (Floating) -->
+    <div id="sidePanel"
+        class="fixed top-4 bottom-4 right-4 w-[480px] glass-panel rounded-3xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-40 flex flex-col overflow-hidden border border-white/60">
+        <!-- Header -->
+        <div class="p-6 bg-gradient-to-r from-violet-50 to-fuchsia-50 border-b border-violet-100 relative">
+            <button onclick="closeSidePanel()"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white text-slate-400 hover:text-slate-600 flex items-center justify-center shadow-sm hover:shadow transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 id="panelTitle" class="text-xl font-bold text-slate-800 mb-1">Analysis</h2>
+            <p id="panelSubtitle" class="text-sm text-slate-500">AI-powered insights</p>
+        </div>
+
+        <!-- Content -->
+        <div id="panelContent" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Dynamic Content -->
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalOverlay"
+        class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <!-- Candidate Modal -->
+        <div id="candidateModal"
+            class="modal-content hidden bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 transform scale-95 transition-transform duration-300">
+            <h3 class="text-xl font-bold mb-6">Add Candidate</h3>
+            <form onsubmit="saveCandidate(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input name="first_name" placeholder="First Name" required
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                    <input name="last_name" placeholder="Last Name" required
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                </div>
+                <input name="email" type="email" placeholder="Email Address" required
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                <input name="phone" placeholder="Phone Number" required
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                <div class="grid grid-cols-2 gap-4">
+                    <input name="years_experience" type="number" placeholder="Yrs Exp"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                    <select name="education"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                        <option>High School</option>
+                        <option>Diploma</option>
+                        <option>Bachelors</option>
+                        <option>Masters</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeAllModals()"
+                        class="px-6 py-2 rounded-xl text-slate-500 hover:bg-slate-100 font-medium">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-violet-600 text-white font-medium hover:bg-violet-700 shadow-lg shadow-violet-200">Save
+                        Candidate</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Job Modal -->
+        <div id="jobModal"
+            class="modal-content hidden bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 transform scale-95 transition-transform duration-300">
+            <h3 class="text-xl font-bold mb-6">Post New Job</h3>
+            <form onsubmit="saveJob(event)" class="space-y-4">
+                <input name="title" placeholder="Job Title" required
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                <input name="department" placeholder="Department" required
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                <input name="location" placeholder="Location" required
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                <div class="grid grid-cols-2 gap-4">
+                    <input name="salary_min" type="number" placeholder="Min Salary"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                    <input name="salary_max" type="number" placeholder="Max Salary"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-violet-500">
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeAllModals()"
+                        class="px-6 py-2 rounded-xl text-slate-500 hover:bg-slate-100 font-medium">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-violet-600 text-white font-medium hover:bg-violet-700 shadow-lg shadow-violet-200">Post
+                        Job</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Modal -->
+        <div id="resultModal"
+            class="modal-content hidden bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-95 transition-transform duration-300">
+            <div id="resultIcon"
+                class="w-20 h-20 rounded-full bg-green-50 text-green-500 text-4xl flex items-center justify-center mx-auto mb-6">
+            </div>
+            <h3 id="resultTitle" class="text-xl font-bold text-slate-800 mb-2">Success</h3>
+            <div id="resultBody" class="text-slate-500 mb-6 leading-relaxed"></div>
+            <div id="resultExtra" class="bg-slate-50 rounded-xl p-4 text-left text-sm text-slate-600 mb-6 hidden"></div>
+            <button onclick="closeAllModals()"
+                class="w-full py-3 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        // --- UI Logic ---
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            // Show target page
+            document.getElementById(pageId).classList.remove('hidden');
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-violet-50', 'text-violet-600'));
+            event.currentTarget.classList.add('bg-violet-50', 'text-violet-600');
+
+            // Update Title
+            document.getElementById('pageTitle').textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
+
+            // Close panel
+            closeSidePanel();
+
+            // Load Data
+            if (pageId === 'dashboard') loadDashboard();
+            if (pageId === 'candidates') loadCandidates();
+            if (pageId === 'applications') loadApplications();
+            if (pageId === 'jobs') loadJobs();
+        }
+
+        function closeSidePanel() {
+            document.getElementById('sidePanel').classList.add('translate-x-[120%]');
+        }
+
+        function openModal(modalId) {
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.remove('hidden');
+            // Trigger reflow
+            void overlay.offsetWidth;
+            overlay.classList.remove('opacity-0');
+
+            document.querySelectorAll('.modal-content').forEach(el => el.classList.add('hidden'));
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('scale-95');
+        }
+
+        function closeAllModals() {
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.add('opacity-0');
+            document.querySelectorAll('.modal-content').forEach(el => el.classList.add('scale-95'));
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                document.querySelectorAll('.modal-content').forEach(el => el.classList.add('hidden'));
+            }, 300);
+        }
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            const colors = type === 'success' ? 'border-l-4 border-green-500' :
+                type === 'error' ? 'border-l-4 border-red-500' : 'border-l-4 border-blue-500';
+
+            const icon = type === 'success' ? '<i class="fas fa-check-circle text-green-500"></i>' :
+                type === 'error' ? '<i class="fas fa-exclamation-circle text-red-500"></i>' : '<i class="fas fa-info-circle text-blue-500"></i>';
+
+            toast.className = `pointer-events-auto bg-white p-4 rounded-xl shadow-2xl flex items-start gap-3 w-80 toast-enter ${colors}`;
+            toast.innerHTML = `
+                <div class="mt-0.5 text-lg">${icon}</div>
+                <div>
+                    <div class="font-bold text-sm text-slate-800">${title}</div>
+                    <div class="text-xs text-slate-500 mt-1 leading-relaxed">${message}</div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-enter-active');
+            });
+
+            // Remove after 5s
+            setTimeout(() => {
+                toast.classList.remove('toast-enter-active');
+                toast.classList.add('toast-exit-active');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // --- Data Logic ---
+        async function loadDashboard() {
+            const res = await fetch(`${API_URL}/analytics/dashboard`);
+            const data = await res.json();
+
+            document.getElementById('totalCandidates').textContent = data.total_candidates;
+            document.getElementById('activeApplications').textContent = data.active_applications;
+            document.getElementById('interviewsScheduled').textContent = data.interviews_scheduled;
+            document.getElementById('hiredThisMonth').textContent = data.hired_this_month;
+
+            updateSuggestion(1, data.total_candidates, 'candidates');
+            updateSuggestion(2, data.active_applications, 'applications');
+            updateSuggestion(3, data.interviews_scheduled, 'interviews');
+            updateSuggestion(4, data.hired_this_month, 'hires');
+
+            // Load recent apps for the table
+            loadRecentApplications();
+        }
+
+        function updateSuggestion(id, val, type) {
+            const msgs = {
+                candidates: val > 50 ? "Great talent pool! Use AI to screen top 10%." : "Low candidate count. Boost job posts.",
+                applications: val > 20 ? "High volume. Enable auto-screening." : "Check job descriptions to attract more applicants.",
+                interviews: val > 5 ? "Busy week! Ensure interviewers are prepped." : "Schedule more screenings to fill pipeline.",
+                hires: val > 2 ? "On track with hiring goals! 🎉" : "Focus on closing candidates in offer stage."
+            };
+            document.getElementById(`aiSuggestion${id}`).textContent = msgs[type];
+        }
+
+        async function loadRecentApplications() {
+            const res = await fetch(`${API_URL}/applications?limit=5`);
+            const data = await res.json();
+            const html = data.applications.map(a => `
+                <div onclick="showDetails('application', '${a.application_id}')" class="p-4 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors flex items-center justify-between last:border-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">
+                            ${a.first_name[0]}${a.last_name[0]}
+                        </div>
+                        <div>
+                            <div class="font-semibold text-sm text-slate-800">${a.first_name} ${a.last_name}</div>
+                            <div class="text-xs text-slate-500">${a.job_title}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right hidden sm:block">
+                            <div class="text-xs font-bold text-violet-600">${a.ai_screening_score}% Match</div>
+                            <div class="w-20 h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                <div class="h-full bg-violet-500 rounded-full" style="width: ${a.ai_screening_score}%"></div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(a.status)}">
+                            ${a.status}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('recentAppsTable').innerHTML = html;
+        }
+
+        function getStatusColor(status) {
+            const map = {
+                'New': 'bg-blue-50 text-blue-600',
+                'Screening': 'bg-purple-50 text-purple-600',
+                'Interview': 'bg-amber-50 text-amber-600',
+                'Interview Scheduled': 'bg-amber-50 text-amber-600',
+                'Offer': 'bg-green-50 text-green-600',
+                'Hired': 'bg-emerald-100 text-emerald-700',
+                'Rejected': 'bg-red-50 text-red-600',
+            };
+            return map[status] || 'bg-slate-100 text-slate-600';
+        }
+
+        async function loadCandidates() {
+            const res = await fetch(`${API_URL}/candidates`);
+            const data = await res.json();
+
+            const html = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-xs font-bold text-slate-400 uppercase border-b border-slate-100">
+                            <th class="px-6 py-4">Candidate</th>
+                            <th class="px-6 py-4">Experience</th>
+                            <th class="px-6 py-4">Education</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-slate-600">
+                        ${data.candidates.map(c => `
+                            <tr onclick="showDetails('candidate', '${c.candidate_id}')" class="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="font-semibold text-slate-800">${c.first_name} ${c.last_name}</div>
+                                    <div class="text-xs text-slate-400">${c.email}</div>
+                                </td>
+                                <td class="px-6 py-4">${c.years_experience} Years</td>
+                                <td class="px-6 py-4">${c.education}</td>
+                                <td class="px-6 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-violet-500 hover:text-violet-700 font-medium text-xs">View AI <i class="fas fa-arrow-right ml-1"></i></button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('candidatesTable').innerHTML = html;
+        }
+
+        async function loadApplications() {
+            const res = await fetch(`${API_URL}/applications`);
+            const data = await res.json();
+            // Similar table structure... reuse logic or keep simple
+            const html = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-xs font-bold text-slate-400 uppercase border-b border-slate-100">
+                            <th class="px-6 py-4">Applicant</th>
+                            <th class="px-6 py-4">Role</th>
+                            <th class="px-6 py-4">AI Score</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-slate-600">
+                        ${data.applications.map(a => `
+                            <tr onclick="showDetails('application', '${a.application_id}')" class="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-800">${a.first_name} ${a.last_name}</td>
+                                <td class="px-6 py-4">${a.job_title}</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-700">${a.ai_screening_score}</span>
+                                        <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-violet-500" style="width:${a.ai_screening_score}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(a.status)}">${a.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('applicationsTable').innerHTML = html;
+        }
+
+        async function loadJobs() {
+            const res = await fetch(`${API_URL}/jobs`);
+            const data = await res.json();
+            const html = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-xs font-bold text-slate-400 uppercase border-b border-slate-100">
+                            <th class="px-6 py-4">Job Title</th>
+                            <th class="px-6 py-4">Department</th>
+                            <th class="px-6 py-4">Location</th>
+                            <th class="px-6 py-4">Applicants</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-slate-600">
+                        ${data.jobs.map(j => `
+                            <tr onclick="showDetails('job', '${j.job_id}')" class="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-800">${j.title}</td>
+                                <td class="px-6 py-4">${j.department}</td>
+                                <td class="px-6 py-4">${j.location}</td>
+                                <td class="px-6 py-4">${j.application_count}</td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">Open</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('jobsTable').innerHTML = html;
+        }
+
+        // --- Side Panel & Agent Logic ---
+        async function showDetails(type, id) {
+            const panel = document.getElementById('sidePanel');
+            panel.classList.remove('translate-x-[120%]');
+
+            document.getElementById('panelContent').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-64 text-slate-400">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-violet-500 mb-4"></i>
+                    <p>Consulting AI Agents...</p>
+                </div>
+            `;
+
+            const res = await fetch(`${API_URL}/${type}s/${id}/insights`);
+            const data = await res.json();
+
+            if (type === 'candidate') renderCandidatePanel(data);
+            if (type === 'application') renderApplicationPanel(data);
+            if (type === 'job') renderJobPanel(data);
+        }
+
+        function renderCandidatePanel(data) {
+            const c = data.candidate;
+            const i = data.insights;
+            document.getElementById('panelTitle').textContent = `${c.first_name} ${c.last_name}`;
+            document.getElementById('panelSubtitle').textContent = c.email;
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">AI Actions</h4>
+                        <div class="space-y-2">
+                            ${renderActionButtons(i.actionable_tasks, c.candidate_id)}
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-chart-bar"></i></div>
+                            <div class="font-bold text-slate-700">Profile Strength</div>
+                        </div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <span class="text-3xl font-bold text-slate-800">${i.profile_strength}</span>
+                            <span class="text-sm text-slate-400 mb-1">/ 100</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 rounded-full" style="width: ${i.profile_strength}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center"><i class="fas fa-lightbulb"></i></div>
+                            <div class="font-bold text-slate-700">Recommendations</div>
+                        </div>
+                        <ul class="space-y-2">
+                            ${i.recommendations.map(r => `<li class="text-sm text-slate-600 flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> ${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('panelContent').innerHTML = html;
+        }
+
+        function renderApplicationPanel(data) {
+            const a = data.application;
+            const i = data.insights;
+            document.getElementById('panelTitle').textContent = "Application Analysis";
+            document.getElementById('panelSubtitle').textContent = `${a.first_name} • ${a.job_title}`;
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">AI Actions</h4>
+                        <div class="space-y-2">
+                            ${renderActionButtons(i.actionable_tasks, a.application_id)}
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fas fa-bullseye"></i></div>
+                            <div class="font-bold text-slate-700">Fit Score</div>
+                        </div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <span class="text-3xl font-bold text-slate-800">${i.fit_score}</span>
+                            <span class="text-sm text-slate-400 mb-1">/ 100</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500 rounded-full" style="width: ${i.fit_score}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center"><i class="fas fa-thumbs-up"></i></div>
+                            <div class="font-bold text-slate-700">Key Strengths</div>
+                        </div>
+                        <ul class="space-y-2">
+                            ${i.strengths.map(s => `<li class="text-sm text-slate-600 flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> ${s.replace('✅ ', '')}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('panelContent').innerHTML = html;
+        }
+
+        function renderJobPanel(data) {
+            const j = data.job;
+            const i = data.insights;
+            document.getElementById('panelTitle').textContent = j.title;
+            document.getElementById('panelSubtitle').textContent = `${j.department} • ${j.location}`;
+
+            let html = `
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">AI Actions</h4>
+                        <div class="space-y-2">
+                            ${renderActionButtons(i.actionable_tasks, j.job_id)}
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="font-bold text-slate-700">Market Analysis</div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-xs text-slate-400 uppercase">Salary Range</div>
+                                <div class="font-medium text-slate-700">${i.market_insights.salary_range}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-400 uppercase">Competitiveness</div>
+                                <div class="font-medium text-emerald-600">${i.market_insights.salary_competitiveness}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('panelContent').innerHTML = html;
+        }
+
+        function renderActionButtons(tasks, entityId) {
+            if (!tasks || tasks.length === 0) return '<p class="text-sm text-slate-400 italic">No actions available</p>';
+
+            return tasks.map(t => {
+                const params = t.params ? JSON.stringify(t.params).replace(/"/g, '&quot;') : '{}';
+                return `
+                    <button onclick="executeAgentTask('${t.type}', '${entityId}', ${params}, this)" 
+                        class="w-full py-3 px-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-violet-300 hover:text-violet-600 transition-all flex items-center gap-3 text-sm font-medium text-slate-700 group">
+                        <span class="w-8 h-8 rounded-lg bg-slate-50 group-hover:bg-violet-50 flex items-center justify-center text-slate-500 group-hover:text-violet-600 transition-colors">
+                            <i class="fas fa-bolt"></i>
+                        </span>
+                        ${t.label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // --- Agent Execution ---
+        async function executeAgentTask(taskType, entityId, params = {}, btnElement) {
+            const originalContent = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-circle-notch fa-spin text-violet-500 mx-auto"></i>';
+            btnElement.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/agent/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task_type: taskType, entity_id: entityId, params: params })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (taskType === 'schedule_screening_call' || taskType === 'schedule_interview') {
+                        showResultModal(data.result);
+                    } else {
+                        showToast('Agent Task Completed', formatAgentResult(data.result), 'success');
+                    }
+
+                    // Refresh data if needed
+                    if (taskType.includes('status')) loadApplications();
+                } else {
+                    showToast('Agent Error', 'Task failed to execute', 'error');
+                }
+            } catch (e) {
+                showToast('Network Error', e.message, 'error');
+            } finally {
+                btnElement.innerHTML = originalContent;
+                btnElement.disabled = false;
+            }
+        }
+
+        function showResultModal(result) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const body = document.getElementById('resultBody');
+            const extra = document.getElementById('resultExtra');
+
+            openModal('resultModal');
+            extra.classList.add('hidden');
+
+            if (result.action === 'screening_scheduled' || result.action === 'interview_scheduled') {
+                icon.innerHTML = '<i class="fas fa-calendar-check"></i>';
+                title.textContent = 'Meeting Scheduled!';
+                body.innerHTML = `
+                    <div class="space-y-1">
+                        <p><span class="font-bold">Candidate:</span> ${result.candidate}</p>
+                        <p><span class="font-bold">Time:</span> ${result.scheduled_for}</p>
+                        ${result.job ? `<p><span class="font-bold">Job:</span> ${result.job}</p>` : ''}
+                    </div>
+                `;
+
+                if (result.calendar_link) {
+                    extra.classList.remove('hidden');
+                    extra.innerHTML = `<div class="flex items-center gap-2"><i class="fab fa-google text-blue-500"></i> <a href="${result.calendar_link}" target="_blank" class="text-blue-600 hover:underline">Open in Google Calendar</a></div>`;
+                }
+            }
+        }
+
+        function formatAgentResult(result) {
+            if (result.action === 'email_sent') return `Sent email to ${result.to} with ${result.jobs_recommended} job recommendations.`;
+            if (result.action === 'status_updated') return `Application status updated to ${result.new_status}.`;
+            if (result.action === 'fast_tracked') return `Candidate fast-tracked to Offer stage!`;
+            if (result.action === 'job_boosted') return `Job boosted on LinkedIn & Indeed. Est reach: +500.`;
+            if (result.action === 'salary_adjusted') return `Salary range updated to ${result.new_range}.`;
+            return JSON.stringify(result);
+        }
+
+        // --- Init ---
+        loadDashboard();
+
+        // --- Forms ---
+        async function saveCandidate(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.years_experience = parseInt(data.years_experience);
+
+            await fetch(`${API_URL}/candidates`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            });
+            closeAllModals();
+            loadCandidates();
+            showToast('Success', 'Candidate added successfully');
+        }
+
+        async function saveJob(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.salary_min = parseFloat(data.salary_min);
+            data.salary_max = parseFloat(data.salary_max);
+
+            await fetch(`${API_URL}/jobs`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            });
+            closeAllModals();
+            loadJobs();
+            showToast('Success', 'Job posted successfully');
+        }
+    </script>
+</body>
+
+</html>

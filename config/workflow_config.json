@@ -1,0 +1,117 @@
+{
+  "workflow_version": "1.0.0",
+  "framework": "LangGraph",
+  "model": "gpt-4o-mini",
+  "statistics": {
+    "total_nodes": 11,
+    "node_names": [
+      "__start__",
+      "supervisor_agent",
+      "candidate_screening_agent",
+      "onboarding_agent",
+      "compliance_agent",
+      "payroll_agent",
+      "analytics_agent",
+      "general_help_agent",
+      "human_escalation_agent",
+      "final_answer_agent",
+      "__end__"
+    ],
+    "entry_point": "supervisor_agent",
+    "terminal_nodes": [
+      "final_answer_agent",
+      "human_escalation_agent"
+    ],
+    "specialist_agents": [
+      "candidate_screening_agent",
+      "onboarding_agent",
+      "compliance_agent",
+      "payroll_agent",
+      "analytics_agent",
+      "general_help_agent"
+    ],
+    "max_iterations": 5
+  },
+  "agents": {
+    "supervisor_agent": {
+      "type": "orchestrator",
+      "max_iterations": 5,
+      "tools": [
+        "ask_user"
+      ]
+    },
+    "candidate_screening_agent": {
+      "type": "specialist",
+      "domain": "recruitment",
+      "tools": [
+        "get_candidate_details",
+        "get_application_status",
+        "get_interview_schedule"
+      ]
+    },
+    "onboarding_agent": {
+      "type": "specialist",
+      "domain": "onboarding",
+      "tools": [
+        "get_onboarding_tasks",
+        "get_candidate_details"
+      ]
+    },
+    "compliance_agent": {
+      "type": "specialist",
+      "domain": "compliance",
+      "tools": [
+        "get_compliance_status",
+        "get_candidate_details"
+      ]
+    },
+    "payroll_agent": {
+      "type": "specialist",
+      "domain": "payroll",
+      "tools": [
+        "process_mpesa_payment",
+        "get_payroll_history",
+        "check_payment_status"
+      ]
+    },
+    "analytics_agent": {
+      "type": "specialist",
+      "domain": "analytics",
+      "tools": [
+        "get_hiring_metrics",
+        "get_pipeline_analytics"
+      ]
+    },
+    "general_help_agent": {
+      "type": "specialist",
+      "domain": "general",
+      "tools": [
+        "chromadb_vector_search"
+      ]
+    },
+    "human_escalation_agent": {
+      "type": "terminal",
+      "domain": "escalation",
+      "tools": []
+    },
+    "final_answer_agent": {
+      "type": "terminal",
+      "domain": "response_formatting",
+      "tools": []
+    }
+  },
+  "routing_rules": {
+    "entry_point": "supervisor_agent",
+    "terminal_nodes": [
+      "final_answer_agent",
+      "human_escalation_agent"
+    ],
+    "clarification_loop": "supervisor_agent",
+    "fallback_agent": "general_help_agent"
+  },
+  "safety_limits": {
+    "max_supervisor_iterations": 5,
+    "max_conversation_length": 50,
+    "auto_escalation_threshold": 5
+  }
+}

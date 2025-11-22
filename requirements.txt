@@ -1,0 +1,24 @@
+# Core dependencies
+openai
+langgraph
+python-dotenv
+
+# Web Server
+fastapi
+uvicorn
+aiofiles
+
+# Data handling
+pandas
+numpy
+
+# Vector store
+chromadb
+
+# HTTP requests
+requests
+httpx
+
+# Utilities
+tqdm
+pydantic
