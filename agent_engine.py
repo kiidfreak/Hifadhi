@@ -34,14 +34,73 @@ class AgentEvent(BaseModel):
 # --- Tool Definitions ---
 
 def search_linkedin(role: str, location: str = "Kenya"):
-    """Simulates searching LinkedIn for candidates"""
+    """Simulates searching LinkedIn for candidates and saves them to DB"""
+    import sqlite3
+    from datetime import datetime
+    
+    # Mock candidate data
+    candidates = [
+        {"name": "John Doe", "role": role, "experience": "5 years", "match": "High"},
+        {"name": "Jane Smith", "role": role, "experience": "3 years", "match": "Medium"}
+    ]
+    
+    # Save to database
+    try:
+        conn = sqlite3.connect('data/hifadhi.db')
+        cursor = conn.cursor()
+        
+        saved_count = 0
+        for candidate in candidates:
+            # Generate candidate ID
+            cursor.execute("SELECT COUNT(*) FROM candidates")
+            count = cursor.fetchone()[0]
+            candidate_id = f"CAND{str(count + 1 + saved_count).zfill(5)}"
+            
+            # Parse experience (e.g., "5 years" -> 5)
+            years_exp = int(candidate["experience"].split()[0]) if candidate["experience"] else 0
+            
+            # Split name
+            name_parts = candidate["name"].split()
+            first_name = name_parts[0]
+            last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+            
+            # Insert candidate
+            try:
+                cursor.execute("""
+                    INSERT INTO candidates (
+                        candidate_id, first_name, last_name, email, phone,
+                        years_experience, education, current_location,
+                        willing_to_relocate, available_start_date
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    candidate_id,
+                    first_name,
+                    last_name,
+                    f"{first_name.lower()}.{last_name.lower()}@example.com",
+                    "+254700000000",
+                    years_exp,
+                    "Bachelors" if candidate["match"] == "High" else "High School",
+                    location,
+                    True,
+                    datetime.now().strftime('%Y-%m-%d')
+                ))
+                saved_count += 1
+            except sqlite3.IntegrityError:
+                # Email already exists, skip
+                pass
+        
+        conn.commit()
+        conn.close()
+        logger.info(f"💾 Saved {saved_count} candidates to database")
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to save candidates to DB: {e}")
+    
     return {
         "source": "LinkedIn",
-        "candidates": [
-            {"name": "John Doe", "role": role, "experience": "5 years", "match": "High"},
-            {"name": "Jane Smith", "role": role, "experience": "3 years", "match": "Medium"}
-        ]
+        "candidates": candidates,
+        "saved_to_db": saved_count
     }
+
 
 def screen_resume(candidate_name: str, skills: List[str]):
     """Simulates screening a resume"""
