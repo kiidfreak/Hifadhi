@@ -35,7 +35,7 @@ Agents communicate via an event bus (e.g., `AgentEvent`).
 - **Communication:** Slack/Teams/Email integration for agent notifications.
 
 ## 5. Implementation Roadmap (Phase 1)
-1.  **`agent_engine.py`:** Implement the base `Agent` class and `Orchestrator`.
+1.  **`agent_engine.py`:** Implement the base `Agent` and `Orchestrator`.
 2.  **`tools/`:** Migrate existing tools (database, email) into the new agent tool format.
 3.  **`dashboard_v6.html`:** A "Mission Control" UI that visualizes agent thoughts and active workflows.
 

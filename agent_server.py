@@ -714,15 +714,16 @@ async def get_dashboard_stats():
         "interviews_scheduled": interviews,
         "hired_this_month": hired
     }
+
 @app.get("/")
 async def root():
     return {"status": "online", "system": "Hifadhi AI with Agents", "version": "5.0.0"}
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def serve_dashboard():
-    """Serve the Agent Dashboard V5 (Soft UI)"""
+    """Serve the Agent Dashboard V6 (with Mission Control)"""
     try:
-        with open("dashboard_v5.html", "r", encoding="utf-8") as f:
+        with open("dashboard_v6.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         return HTMLResponse(content="<h1>Dashboard Not Found</h1>", status_code=404)

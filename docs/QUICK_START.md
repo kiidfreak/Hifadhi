@@ -1,154 +1,91 @@
-# 🚀 QUICK START GUIDE - Production Setup
+# Hifadhi AI - Quick Start Guide
 
-## Step 1: Get OpenAI API Key (2 minutes)
-1. Go to: https://platform.openai.com/api-keys
-2. Create account (free)
-3. Click "Create new secret key"
-4. Copy the key (starts with sk-proj-...)
+## Prerequisites
+- Python 3.8+
+- OpenAI API key
 
-## Step 2: Configure Environment (1 minute)
-Edit the .env file:
+## Setup (5 minutes)
+
+### 1. Clone & Install
 ```bash
-OPENAI_API_KEY=sk-proj-paste-your-key-here
+cd HifadhiOS
+pip install -r requirements.txt
 ```
 
-## Step 3: Run Production Server (1 minute)
-```bash
-python web_server.py
+### 2. Configure
+Create `.env`:
+```
+OPENAI_API_KEY=sk-your-key-here
 ```
 
-## Step 4: Test (1 minute)
-Open browser: http://localhost:8000/ui
-Ask: "What is the status of application APP00001?"
+### 3. Initialize Database
+```bash
+python -c "from tools.database_tools import init_database; init_database()"
+```
 
-Now you'll get REAL AI responses! 🤖
+### 4. Start Servers
+
+**Terminal 1** - Main HR System:
+```bash
+python agent_server.py
+```
+
+**Terminal 2** - Agent Orchestrator:
+```bash
+python agent_os_server.py
+```
+
+### 5. Access Dashboard
+Open browser: `http://localhost:8000/dashboard`
 
 ---
 
-## Optional: Enable M-Pesa Payments
+## First Mission
 
-### Get PayLink Account
-1. Visit: https://paylink.ke
-2. Sign up for business account
-3. Get API credentials
-4. Add to .env:
+1. Click **Mission Control** in sidebar
+2. Type: `Find Python developers with 5+ years experience`
+3. Click **Launch Mission**
+4. Watch agents work in real-time!
+
+You'll see:
+- 🟡 **SourcingAgent** → Finding candidates
+- 🟡 **ScreeningAgent** → Screening resumes
+- 🟡 **InterviewAgent** → Scheduling interviews
+- ✅ **Mission Complete** with next steps
+
+---
+
+## Troubleshooting
+
+### Port Already in Use
 ```bash
-PAYLINK_API_KEY=your_key
-PAYLINK_API_SECRET=your_secret
+# Windows
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -i :8000
+kill -9 <PID>
+```
+
+### Agents Not Working
+- Check `.env` has valid OpenAI API key
+- Restart both servers
+- Check browser console for errors
+
+### No Data Showing
+```bash
+# Reset database
+python -c "from tools.database_tools import init_database; init_database()"
 ```
 
 ---
 
-## Deploy to Cloud (Azure Example)
+## What's Next?
 
-### Prerequisites
-- Azure account (free tier available)
-- Azure CLI installed
+- ✅ Try different missions
+- ✅ Explore AI insights on candidates
+- ✅ Review agent activity logs
+- 📚 Read `ARCHITECTURE_V2.md` to understand the system
 
-### Deploy
-```bash
-# Login
-az login
-
-# Deploy
-az webapp up --name hifadhi-hr-prod --runtime "PYTHON:3.11" --sku B1
-
-# Your app will be live at:
-# https://hifadhi-hr-prod.azurewebsites.net
-```
-
----
-
-## Deploy to Heroku (Easiest)
-
-```bash
-# Install Heroku CLI
-# Then:
-
-heroku create hifadhi-hr
-git push heroku main
-
-# Live at: https://hifadhi-hr.herokuapp.com
-```
-
----
-
-## Security Checklist for Production
-
-- [ ] Add HTTPS/SSL certificate
-- [ ] Set strong API keys
-- [ ] Enable rate limiting
-- [ ] Add authentication (login system)
-- [ ] Backup database daily
-- [ ] Monitor logs
-- [ ] Set up error alerts
-
----
-
-## Scaling for Growth
-
-### 100 employees
-- Current setup works perfectly ✅
-
-### 1,000 employees  
-- Add Redis caching
-- Use PostgreSQL instead of SQLite
-- 2-4 Uvicorn workers
-
-### 10,000+ employees
-- Kubernetes cluster
-- Load balancer
-- Distributed database
-- Dedicated AI infrastructure
-
----
-
-## Support & Maintenance
-
-### Monthly Tasks
-- [ ] Review analytics
-- [ ] Update candidate data
-- [ ] Check payment logs
-- [ ] Monitor API costs
-
-### Quarterly Tasks
-- [ ] Security audit
-- [ ] Performance optimization
-- [ ] Feature updates
-- [ ] User feedback review
-
----
-
-## Getting Help
-
-1. **Documentation**: Check `/docs` folder
-2. **API Docs**: http://localhost:8000/docs
-3. **Logs**: Check `logs/hifadhi.log`
-4. **Phoenix Dashboard**: http://localhost:6006 (debugging)
-
----
-
-## ROI Calculator
-
-### Before Hifadhi
-- HR Manager time: 20 hrs/week on manual tasks
-- Cost: ~$1,000/month in HR labor
-
-### After Hifadhi  
-- HR Manager time: 5 hrs/week
-- System cost: ~$20/month
-- **Savings**: ~$980/month + faster hiring
-
-**Payback Period**: Immediate! 🎉
-
----
-
-## Next Steps
-
-1. ✅ You have the UI and demo working
-2. ⏳ Add OpenAI API key → Get real AI
-3. ⏳ Deploy to cloud → Go live
-4. ⏳ Add PayLink → Process payments
-5. ⏳ Market to companies → Start earning
-
-**You're 95% there!** Just need that API key! 🚀
+**Need help?** Check logs in terminal or browser console.
