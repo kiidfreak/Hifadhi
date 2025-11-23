@@ -294,25 +294,43 @@ class Orchestrator:
 
     def _extract_role_from_mission(self, mission: str) -> str:
         """Extract the job role from mission text"""
-        # Common patterns: "Hire a X", "Find X", "Search for X", etc.
         import re
         
-        # Try common patterns
+        # Try common patterns (order matters - most specific first)
         patterns = [
-            r"hire (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|$)",
-            r"find (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|$)",
-            r"search for (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|$)",
-            r"recruit (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|$)",
+            r"hire (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
+            r"find (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
+            r"search (?:for )?(?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
+            r"recruit (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
+            r"looking for (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
+            r"need (?:a |an )?(.+?)(?:\s+in\s+|\s+for\s+|\s+at\s+|$)",
         ]
         
-        mission_lower = mission.lower()
+        mission_lower = mission.lower().strip()
+        
+        # Try pattern matching
         for pattern in patterns:
             match = re.search(pattern, mission_lower)
             if match:
                 role = match.group(1).strip()
-                # Clean up common words
-                role = re.sub(r'\s+in\s+.*$', '', role)  # Remove location
+                # Clean up common words at the end
+                role = re.sub(r'\s+(in|for|at)\s+.*$', '', role)
+                # Remove leading articles if they slipped through
+                role = re.sub(r'^(a |an |the )', '', role)
                 return role.title()  # Capitalize properly
+        
+        # If no pattern matches, assume the entire mission is a role name
+        # Remove common stopwords
+        simple_role = re.sub(r'^(find|hire|search|recruit|need|looking for|get|want)\s+', '', mission_lower)
+        simple_role = re.sub(r'^(a |an |the )', '', simple_role)
+        simple_role = re.sub(r'\s+(in|for|at)\s+.*$', '', simple_role)
+        
+        if simple_role and simple_role != mission_lower:
+            return simple_role.strip().title()
+        
+        # Last resort: if mission is just a role name (e.g., "accountant")
+        if len(mission.split()) <= 3:  # Short mission, likely just the role
+            return mission.strip().title()
         
         # Default fallback
         return "Candidate"
